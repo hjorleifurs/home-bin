@@ -1,22 +1,49 @@
 #!/bin/bash
 ICON=/tmp/xkcd #might be png or jpg, identify from imagemagick will know
-TMPBG=/tmp/screen.png
-
-PIXELATE="-scale 5% -sample 2000%"
-BLUR="-scale 5% -blur 0x2 -filter lanczos -resize 2000%"
-FILTER=$BLUR
+TMPBG=/home/hjolli/Pictures/Backgrounds/i3back.png
+SCALE=`xdpyinfo  | grep -oP 'dimensions:\s+\K\S+'`
 
 function main {
 	if [[ ! -e $ICON ]]; then
+		checkinternet > /dev/null 2>&1
 		download_xkcd &
+		wait
 	fi
-	getScreenshot &
-	wait
-	embedComic
+	if [[ ! -e $TMPBG ]]; then
+		iconresize
+		wait
+		getBackground &
+		wait
+		embedComic
+	fi
 	i3lock -i $TMPBG &
+	iconresize
+	wait
+	getBackground &
+	checkinternet > /dev/null 2>&1
 	download_xkcd &
 	wait
-	cleanup
+	embedComic &
+	#cleanup
+}
+
+function checkinternet {
+	if ping -q -c 1 -W 1 8.8.8.8 >/dev/null; then
+  	echo "we have connection"
+	else
+	exit > /dev/null
+	fi
+}
+
+function iconresize {
+	if [ ${SCALE} = "3840x2160" ]
+	then
+		RESIZE=250%
+		DORESIZE="-resize ${RESIZE}"
+	else
+		RESIZE=100%
+		DORESIZE=""
+	fi
 }
 
 function download_xkcd {
@@ -29,13 +56,9 @@ function download_xkcd {
 	curl -sL "$URL" -o $ICON
 }
 
-function getScreenshot {
-	if [[ $(type -P "scrot") ]]; then 
-		scrot $TMPBG;               #scrot is faster
-	else 
-		import -window root $TMPBG; #from the imagemagick suite
-	fi
-	convert $TMPBG $FILTER $TMPBG
+function getBackground {
+	IMG=`ls /home/hjolli/Pictures/Backgrounds/*.png | shuf -n 1`
+	convert -resize ${SCALE} ${IMG} $TMPBG
 }
 
 function embedComic {
@@ -50,7 +73,7 @@ function embedComic {
 			local PX=$((${C_S[2]} + ${C_S[0]} / 16 - ${C_C[0]} / 16))
 			local PY=$((${C_S[3]} + ${C_S[1]} / 16 - ${C_C[1]} / 16))
 			if [[ "$COMM" == "" ]]; then
-				COMM="convert $TMPBG \( $ICON -repage +$PX+$PY \) "
+				COMM="convert $TMPBG \( $ICON ${DORESIZE} -repage +$PX+$PY \) "
 			else
 				COMM="${COMM}\( +clone -repage +$PX+$PY \) " #avoid extra file reads
 			fi
