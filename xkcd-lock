@@ -1,4 +1,5 @@
 #!/bin/bash
+
 ICON=/tmp/xkcd #might be png or jpg, identify from imagemagick will know
 TMPBG=/home/hjolli/Pictures/Backgrounds/i3back.png
 SCALE=`xdpyinfo  | grep -oP 'dimensions:\s+\K\S+'`
@@ -16,6 +17,7 @@ function main {
 		wait
 		embedComic
 	fi
+
 	i3lock -i $TMPBG &
 	iconresize
 	wait
