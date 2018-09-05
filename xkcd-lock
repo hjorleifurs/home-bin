@@ -18,7 +18,7 @@ function main {
 		embedComic
 	fi
 
-	i3lock -i $TMPBG &
+	i3lock -c 000000 -i $TMPBG &
 	iconresize
 	wait
 	getBackground &
