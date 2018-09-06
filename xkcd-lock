@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ICON=/tmp/xkcd #might be png or jpg, identify from imagemagick will know
-TMPBG=/home/hjolli/Pictures/Backgrounds/i3back.png
+TMPBG=/home/hs/Pictures/Backgrounds/i3back.png
 SCALE=`xdpyinfo  | grep -oP 'dimensions:\s+\K\S+'`
 
 function main {
@@ -18,7 +18,7 @@ function main {
 		embedComic
 	fi
 
-	i3lock -i $TMPBG &
+	i3lock -c 000000 -i $TMPBG &
 	iconresize
 	wait
 	getBackground &
@@ -59,7 +59,7 @@ function download_xkcd {
 }
 
 function getBackground {
-	IMG=`ls /home/hjolli/Pictures/Backgrounds/PNG/*.png | shuf -n 1`
+	IMG=`ls /home/hs/Pictures/Backgrounds/PNG/*.png | shuf -n 1`
 	convert -resize ${SCALE} ${IMG} $TMPBG
 }
 
