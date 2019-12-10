@@ -2,7 +2,8 @@
 
 ICON=/tmp/xkcd #might be png or jpg, identify from imagemagick will know
 TMPBG=/home/hjolli/Pictures/Backgrounds/i3back.png
-SCALE=`xdpyinfo  | grep -oP 'dimensions:\s+\K\S+'`
+#SCALE=`xdpyinfo  | grep -oP 'dimensions:\s+\K\S+'`
+SCALE=`/usr/bin/xrandr |head -1 | awk -F"," '{print $2}' | awk '{print $2"x"$4}'`
 
 function main {
 	if [[ ! -e $ICON ]]; then
